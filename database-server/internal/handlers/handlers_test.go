@@ -13,7 +13,7 @@ import (
 	"url-shortner-database/internal/models"
 
 	"github.com/golang/mock/gomock"
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
@@ -44,7 +44,7 @@ func TestHandleShorten(t *testing.T) {
 			reqBody:              &models.ShortenRequestModel{Url: "http://www.google.com"},
 			InsertOne:            mockObj.EXPECT().InsertOne(gomock.Any()),
 			InsertOneCall:        1,
-			InsertOneReturnError: errors.New("Error InsertOne"),
+			InsertOneReturnError: assert.AnError,
 			ExpectedStatusCode:   http.StatusInternalServerError,
 		},
 		"Success": {
@@ -69,7 +69,7 @@ func TestHandleShorten(t *testing.T) {
 			req := httptest.NewRequest("POST", "/shorten", bytes.NewBuffer(body))
 			resp := httptest.NewRecorder()
 			handler.HandleShorten(resp, req)
-			assert.Equal(t, resp.Code, test.ExpectedStatusCode, resp.Result().Status)
+			assert.Equal(t, test.ExpectedStatusCode, resp.Code, resp.Result().Status)
 		})
 	}
 }
@@ -101,7 +101,7 @@ func TestHandleRedirect(t *testing.T) {
 		"Error Find One": {
 			reqBody:            &models.RedirectRequestModel{ShortUrlPath: "test"},
 			FindOne:            mockObj.EXPECT().FindOne(gomock.Any()),
-			FindOneReturnError: errors.New("Not Found"),
+			FindOneReturnError: assert.AnError,
 			FindOneReturnUrl:   models.URL{},
 			FindOneCall:        1,
 			ExpectedStatusCode: http.StatusNotFound,
@@ -129,7 +129,7 @@ func TestHandleRedirect(t *testing.T) {
 			req := httptest.NewRequest("POST", "/redirect", bytes.NewBuffer(body))
 			resp := httptest.NewRecorder()
 			handler.HandleRedirect(resp, req)
-			assert.Equal(t, resp.Code, test.ExpectedStatusCode, resp.Result().Status)
+			assert.Equal(t, test.ExpectedStatusCode, resp.Code, resp.Result().Status)
 		})
 	}
 }

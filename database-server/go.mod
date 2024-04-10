@@ -6,7 +6,6 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.4.0
 	github.com/gorilla/mux v1.8.1
-	github.com/magiconair/properties v1.8.7
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.8.4
 	go.mongodb.org/mongo-driver v1.14.0
@@ -19,6 +18,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.0 // indirect
+	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
