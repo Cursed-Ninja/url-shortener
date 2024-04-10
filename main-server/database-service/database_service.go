@@ -16,19 +16,19 @@ type DatabaseServiceInterface interface {
 	HandleRedirect(body io.Reader, requestId string) (*models.RedirectResponseModel, error)
 }
 
-type DatabaseService struct {
+type databaseService struct {
 	config config.ConfigInterface
 	logger *zap.SugaredLogger
 }
 
-func NewDatabaseService(config config.ConfigInterface, logger *zap.SugaredLogger) *DatabaseService {
-	return &DatabaseService{
+func NewDatabaseService(config config.ConfigInterface, logger *zap.SugaredLogger) *databaseService {
+	return &databaseService{
 		config: config,
 		logger: logger,
 	}
 }
 
-func (d *DatabaseService) HandleShorten(body io.Reader, requestId string) (*models.ShortenResponseModel, error) {
+func (d *databaseService) HandleShorten(body io.Reader, requestId string) (*models.ShortenResponseModel, error) {
 	reqUrl := d.config.Get("DATABASE_SERVICE_BASE_URL") + "/shorten"
 
 	d.logger.Info(zap.String("requestId", requestId), "Sending request to database service", zap.String("url", reqUrl))
@@ -86,7 +86,7 @@ func (d *DatabaseService) HandleShorten(body io.Reader, requestId string) (*mode
 	return unmarsheledBody, nil
 }
 
-func (d *DatabaseService) HandleRedirect(body io.Reader, requestId string) (*models.RedirectResponseModel, error) {
+func (d *databaseService) HandleRedirect(body io.Reader, requestId string) (*models.RedirectResponseModel, error) {
 	reqUrl := d.config.Get("DATABASE_SERVICE_BASE_URL") + "/redirect"
 
 	d.logger.Info(zap.String("requestId", requestId), "Sending request to database service", zap.String("url", reqUrl))

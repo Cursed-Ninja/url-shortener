@@ -155,13 +155,14 @@ func (h *handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 	redirectResponseModel, err := h.databaseservice.HandleRedirect(bytes.NewBuffer(redirectRequestModelJson), requestId)
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Error processing redirect request", zap.Error(err))
-
+		
 		if err.Error() == http.StatusText(http.StatusNotFound) {
+			h.logger.Error(zap.String("Request Id", requestId), "URL not found", zap.Error(err))
 			http.Error(w, "URL not found", http.StatusNotFound)
 			return
 		}
-
+		
+		h.logger.Error(zap.String("Request Id", requestId), "Error processing redirect request", zap.Error(err))
 		http.Error(w, "Something went wrong!", http.StatusInternalServerError)
 		return
 	}
