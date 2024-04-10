@@ -26,8 +26,8 @@ func TestGet(t *testing.T) {
 			expected: "",
 		},
 		"EXISTENT_KEY": {
-			key:      "COLLECTION_NAME",
-			expected: "urls",
+			key:      "BASE_URL",
+			expected: "http://localhost:8080",
 		},
 	}
 
