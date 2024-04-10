@@ -15,7 +15,8 @@ type config struct {
 }
 
 func NewConfig(logger *zap.SugaredLogger) (*config, error) {
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("./config")
+	viper.AddConfigPath("../../config")
 	viper.SetConfigType("env")
 	viper.SetConfigName("app")
 
@@ -30,5 +31,6 @@ func NewConfig(logger *zap.SugaredLogger) (*config, error) {
 }
 
 func (config *config) Get(key string) string {
+	config.logger.Info("Getting config value", zap.String("key", key), zap.String("value", config.viper.GetString(key)))
 	return config.viper.GetString(key)
 }

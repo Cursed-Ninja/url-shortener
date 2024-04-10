@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"url-shortner-database/database"
-	"url-shortner-database/models"
-	"url-shortner-database/utils"
+	"time"
+	"url-shortner-database/internal/database"
+	"url-shortner-database/internal/models"
+	"url-shortner-database/internal/utils"
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -28,13 +29,21 @@ func NewBaseHandler(logger *zap.SugaredLogger, dbConnection database.DBInterface
 func (h *baseHandler) HandleShorten(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("Handling shorten request", zap.Any("request", r.Body))
 
+	if r.Body == nil {
+		h.logger.Error("Empty request body")
+		http.Error(w, "Empty request body", http.StatusBadRequest)
+		return
+	}
+
 	httpBody, err := io.ReadAll(r.Body)
 
 	if err != nil {
 		h.logger.Error("Error reading request body", zap.Error(err))
-		http.Error(w, "Error reading request body", http.StatusBadRequest)
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 		return
 	}
+
+	h.logger.Info("Successfully read request body", zap.Any("request", httpBody))
 
 	unmarsheledBody := &models.RequestModel{}
 
@@ -42,12 +51,38 @@ func (h *baseHandler) HandleShorten(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		h.logger.Error("Error unmarshalling request body", zap.Error(err))
-		http.Error(w, "Error unmarshalling JSON", http.StatusBadRequest)
+		http.Error(w, "Error unmarshalling JSON", http.StatusInternalServerError)
+		return
+	}
+
+	if unmarsheledBody.Url == "" {
+		h.logger.Error("Empty URL in request body")
+		http.Error(w, "Empty URL in request body", http.StatusBadRequest)
 		return
 	}
 
 	shortenedUrl := models.RequestModel{
 		Url: utils.KeyGenerationService(unmarsheledBody.Url),
+	}
+
+	url := models.URL{
+		ShortenedUrl: shortenedUrl.Url,
+		Url:          unmarsheledBody.Url,
+		ExpiresAt:    utils.GetExpirationTime(time.Now()),
+	}
+
+	for _, err := h.dbConnection.FindOne(bson.D{{Key: "shortenedurl", Value: url.ShortenedUrl}}); err == nil; {
+		url.ShortenedUrl = utils.KeyGenerationService(unmarsheledBody.Url)
+	}
+
+	h.logger.Info("Generated shortened URL", zap.Any("url", url))
+
+	err = h.dbConnection.InsertOne(url)
+
+	if err != nil {
+		h.logger.Error("Error inserting document", zap.Error(err))
+		http.Error(w, "Error inserting document", http.StatusInternalServerError)
+		return
 	}
 
 	jsonBody, err := json.Marshal(shortenedUrl)
@@ -58,31 +93,16 @@ func (h *baseHandler) HandleShorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := models.URL{
-		ShortenedUrl: shortenedUrl.Url,
-		Url:          unmarsheledBody.Url,
-		ExpiresAt:    utils.GetExpirationTime(),
-	}
-
-	err = h.dbConnection.InsertOne(url)
-
-	if err != nil {
-		h.logger.Error("Error inserting document", zap.Error(err))
-		http.Error(w, "Error inserting document", http.StatusInternalServerError)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonBody)
 
-	h.logger.Info("Successfully shortened URL", zap.Any("response", jsonBody))
+	h.logger.Info("Successfully shortened URL", zap.Any("response", shortenedUrl))
 }
 
 func (h *baseHandler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
 
-	if _, ok := vars["url"]; !ok {
+	if url, ok := vars["url"]; !ok || url == "" {
 		h.logger.Error("URL variable not found")
 		http.Error(w, "URL variable not found", http.StatusBadRequest)
 		return
@@ -98,14 +118,11 @@ func (h *baseHandler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if url.Url == "" {
-		http.Error(w, "URL not found", http.StatusNotFound)
-		return
-	}
-
 	response := models.RequestModel{
 		Url: url.Url,
 	}
+
+	h.logger.Info("Found document", zap.Any("document", url))
 
 	jsonResponse, err := json.Marshal(response)
 

@@ -2,7 +2,7 @@ package database
 
 import (
 	"context"
-	"url-shortner-database/models"
+	"url-shortner-database/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -87,6 +87,17 @@ func (connection *dB) Disconnect() error {
 
 	if err != nil {
 		connection.logger.Error("Could not disconnect from database", zap.Error(err))
+		return err
+	}
+
+	return nil
+}
+
+func (connection *dB) DeleteDb(databaseName string) error {
+	err := connection.client.Database(databaseName).Drop(context.Background())
+
+	if err != nil {
+		connection.logger.Error("Could not drop database", zap.Error(err))
 		return err
 	}
 

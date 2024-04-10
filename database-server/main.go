@@ -2,10 +2,10 @@ package main
 
 import (
 	"net/http"
-	"url-shortner-database/config"
-	"url-shortner-database/database"
-	"url-shortner-database/handlers"
-	"url-shortner-database/logging"
+	"url-shortner-database/internal/config"
+	"url-shortner-database/internal/database"
+	"url-shortner-database/internal/handlers"
+	"url-shortner-database/internal/logging"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
