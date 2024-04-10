@@ -25,6 +25,9 @@ func TestGetExpirationTime(t *testing.T) {
 		"Expiry Time in Past": {
 			expiryTime: time.Now().AddDate(0, 0, -1),
 		},
+		"Expiry Time is 0": {
+			expiryTime: time.Time{},
+		},
 	}
 
 	t.Run("Expiry Time in Future", func(t *testing.T) {
@@ -33,5 +36,9 @@ func TestGetExpirationTime(t *testing.T) {
 
 	t.Run("Expiry Time in Past", func(t *testing.T) {
 		assert.NotEqual(t, tests["Expiry Time in Past"].expiryTime, utils.GetExpirationTime(tests["Expiry Time in Past"].expiryTime), "GetExpirationTime failed")
+	})
+
+	t.Run("Expiry Time is 0", func(t *testing.T) {
+		assert.NotEqual(t, tests["Expiry Time is 0"].expiryTime, utils.GetExpirationTime(tests["Expiry Time is 0"].expiryTime), "GetExpirationTime failed")
 	})
 }

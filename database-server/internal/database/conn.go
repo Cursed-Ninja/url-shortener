@@ -43,7 +43,7 @@ func NewDbConnection(logger *zap.SugaredLogger, dbConnection string, dbName stri
 			Options: options.Index().SetExpireAfterSeconds(0),
 		},
 		{
-			Keys:    bson.D{{Key: "shortenedurl", Value: 1}},
+			Keys:    bson.D{{Key: "shorturlpath", Value: 1}},
 			Options: options.Index().SetUnique(true),
 		},
 	}

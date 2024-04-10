@@ -2,10 +2,9 @@ package models
 
 import "time"
 
-type URL struct {
-	OriginalUrl  string
-	ShortUrlPath string
-	ExpiresAt    time.Time
+type RequestModel struct {
+	Url       string    `json:"url"`
+	ExpiresAt time.Time `json:"expires_at"`
 }
 
 type ShortenRequestModel struct {
@@ -23,4 +22,8 @@ type RedirectRequestModel struct {
 
 type RedirectResponseModel struct {
 	Url string `json:"redirecturl"`
+}
+
+type ResponseModel struct {
+	Url string `json:"url"`
 }

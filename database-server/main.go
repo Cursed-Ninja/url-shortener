@@ -37,7 +37,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/shorten", handlers.HandleShorten).Methods(http.MethodPost)
-	r.HandleFunc("/{url}", handlers.HandleRedirect).Methods(http.MethodGet)
+	r.HandleFunc("/redirect", handlers.HandleRedirect).Methods(http.MethodPost)
 
 	http.Handle("/", r)
 	logger.Error(http.ListenAndServe(":8081", nil))

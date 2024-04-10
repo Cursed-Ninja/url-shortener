@@ -48,8 +48,8 @@ func TestInsertOne(t *testing.T) {
 	}
 
 	document := models.URL{
-		ShortenedUrl: "test",
-		Url:          "test",
+		ShortUrlPath: "test",
+		OriginalUrl:  "test",
 		ExpiresAt:    time.Now(),
 	}
 
@@ -83,8 +83,8 @@ func TestFindOne(t *testing.T) {
 	})
 
 	document := models.URL{
-		ShortenedUrl: "test",
-		Url:          "test",
+		ShortUrlPath: "test",
+		OriginalUrl:  "test",
 		ExpiresAt:    time.Now(),
 	}
 

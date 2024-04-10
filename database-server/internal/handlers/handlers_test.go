@@ -13,7 +13,6 @@ import (
 	"url-shortner-database/internal/models"
 
 	"github.com/golang/mock/gomock"
-	"github.com/gorilla/mux"
 	"github.com/magiconair/properties/assert"
 	"go.uber.org/zap"
 )
@@ -28,7 +27,7 @@ func TestHandleShorten(t *testing.T) {
 	handler := handlers.NewBaseHandler(logger, mockObj)
 
 	tests := map[string]struct {
-		reqBody              *models.RequestModel
+		reqBody              *models.ShortenRequestModel
 		InsertOne            *gomock.Call
 		InsertOneReturnError error
 		InsertOneCall        int
@@ -42,14 +41,14 @@ func TestHandleShorten(t *testing.T) {
 			ExpectedStatusCode:   http.StatusBadRequest,
 		},
 		"Error InsertOne": {
-			reqBody:              &models.RequestModel{Url: "http://www.google.com"},
+			reqBody:              &models.ShortenRequestModel{Url: "http://www.google.com"},
 			InsertOne:            mockObj.EXPECT().InsertOne(gomock.Any()),
 			InsertOneCall:        1,
 			InsertOneReturnError: errors.New("Error InsertOne"),
 			ExpectedStatusCode:   http.StatusInternalServerError,
 		},
 		"Success": {
-			reqBody:              &models.RequestModel{Url: "http://www.google.com"},
+			reqBody:              &models.ShortenRequestModel{Url: "http://www.google.com"},
 			InsertOne:            mockObj.EXPECT().InsertOne(gomock.Any()),
 			InsertOneCall:        1,
 			InsertOneReturnError: nil,
@@ -84,40 +83,36 @@ func TestHandleRedirect(t *testing.T) {
 	handler := handlers.NewBaseHandler(logger, mockObj)
 
 	tests := map[string]struct {
-		reqUrl             string
+		reqBody            *models.RedirectRequestModel
 		FindOne            *gomock.Call
 		FindOneReturnError error
 		FindOneReturnUrl   models.URL
 		FindOneCall        int
 		ExpectedStatusCode int
-		UrlVar             string
 	}{
 		"Empty Request URL": {
-			reqUrl:             "/",
+			reqBody:            nil,
 			FindOne:            mockObj.EXPECT().FindOne(gomock.Any()),
 			FindOneReturnError: nil,
 			FindOneReturnUrl:   models.URL{},
 			FindOneCall:        0,
 			ExpectedStatusCode: http.StatusBadRequest,
-			UrlVar:             "",
 		},
 		"Error Find One": {
-			reqUrl:             "/test",
+			reqBody:            &models.RedirectRequestModel{ShortUrlPath: "test"},
 			FindOne:            mockObj.EXPECT().FindOne(gomock.Any()),
 			FindOneReturnError: errors.New("Not Found"),
 			FindOneReturnUrl:   models.URL{},
 			FindOneCall:        1,
 			ExpectedStatusCode: http.StatusNotFound,
-			UrlVar:             "test",
 		},
 		"Success": {
-			reqUrl:             "/test",
+			reqBody:            &models.RedirectRequestModel{ShortUrlPath: "test"},
 			FindOne:            mockObj.EXPECT().FindOne(gomock.Any()),
 			FindOneReturnError: nil,
-			FindOneReturnUrl:   models.URL{ShortenedUrl: "test", Url: "http://www.google.com", ExpiresAt: time.Now().AddDate(0, 1, 0)},
+			FindOneReturnUrl:   models.URL{ShortUrlPath: "test", OriginalUrl: "http://www.google.com", ExpiresAt: time.Now().AddDate(0, 1, 0)},
 			FindOneCall:        1,
 			ExpectedStatusCode: http.StatusOK,
-			UrlVar:             "test",
 		},
 	}
 
@@ -125,9 +120,14 @@ func TestHandleRedirect(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			test.FindOne.Return(test.FindOneReturnUrl, test.FindOneReturnError).Times(test.FindOneCall)
 
-			req := httptest.NewRequest("GET", test.reqUrl, nil)
+			body, err := json.Marshal(test.reqBody)
+
+			if err != nil {
+				t.Error("Error marshalling request body")
+			}
+
+			req := httptest.NewRequest("POST", "/redirect", bytes.NewBuffer(body))
 			resp := httptest.NewRecorder()
-			req = mux.SetURLVars(req, map[string]string{"url": test.UrlVar})
 			handler.HandleRedirect(resp, req)
 			assert.Equal(t, resp.Code, test.ExpectedStatusCode, resp.Result().Status)
 		})

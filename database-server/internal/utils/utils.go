@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"math/rand"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -47,4 +49,8 @@ func GetExpirationTime(expiryTime time.Time) time.Time {
 	}
 
 	return expiryTime
+}
+
+func GenerateRequestId() string {
+	return uuid.New().String()
 }
