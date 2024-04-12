@@ -5,6 +5,7 @@ import (
 	"main-server/internal/config"
 	"main-server/internal/handlers"
 	"main-server/internal/logging"
+	"main-server/internal/middlewares"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -31,6 +32,6 @@ func main() {
 	r.HandleFunc("/shorten", handlers.HandleShorten).Methods(http.MethodPost)
 	r.HandleFunc("/{url}", handlers.HandleRedirect).Methods(http.MethodGet)
 
-	http.Handle("/", r)
+	http.Handle("/", middlewares.LoggingMiddleware(r))
 	logger.Error(http.ListenAndServe(":8080", nil))
 }

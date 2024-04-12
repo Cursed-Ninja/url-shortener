@@ -126,8 +126,6 @@ func TestHandleRedirect(t *testing.T) {
 
 	handlers := handlers.NewBaseHandler(logger, mockDbService, mockConfig)
 
-	// handleRedirectDbService :=
-
 	tests := map[string]struct {
 		reqUrl                    string
 		HandleRedirect            *gomock.Call
