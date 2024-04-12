@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	databaseservice "main-server/database-service"
+	cacheservice "main-server/external/cache-service"
+	databaseservice "main-server/external/database-service"
 	"main-server/internal/config"
 	"main-server/internal/models"
 	"net/http"
@@ -24,13 +25,15 @@ type handler struct {
 	logger          *zap.SugaredLogger
 	databaseservice databaseservice.DatabaseServiceInterface
 	config          config.ConfigInterface
+	cacheservice    cacheservice.CacheServiceInterface
 }
 
-func NewBaseHandler(logger *zap.SugaredLogger, databaseservice databaseservice.DatabaseServiceInterface, config config.ConfigInterface) *handler {
+func NewBaseHandler(logger *zap.SugaredLogger, databaseservice databaseservice.DatabaseServiceInterface, config config.ConfigInterface, cacheservice cacheservice.CacheServiceInterface) *handler {
 	return &handler{
 		logger:          logger,
 		databaseservice: databaseservice,
 		config:          config,
+		cacheservice:    cacheservice,
 	}
 }
 
@@ -152,19 +155,27 @@ func (h *handler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 
 	h.logger.Info(zap.String("Request Id", requestId), "Successfully marshalled redirect request model", zap.Any("model", redirectRequestModelJson))
 
-	redirectResponseModel, err := h.databaseservice.HandleRedirect(bytes.NewBuffer(redirectRequestModelJson), requestId)
+	redirectResponseModel, err := h.cacheservice.HandleRedirect(bytes.NewBuffer(redirectRequestModelJson), requestId)
 
 	if err != nil {
-		
 		if err.Error() == http.StatusText(http.StatusNotFound) {
 			h.logger.Error(zap.String("Request Id", requestId), "URL not found", zap.Error(err))
 			http.Error(w, "URL not found", http.StatusNotFound)
 			return
 		}
-		
-		h.logger.Error(zap.String("Request Id", requestId), "Error processing redirect request", zap.Error(err))
-		http.Error(w, "Something went wrong!", http.StatusInternalServerError)
-		return
+
+		redirectResponseModel, err = h.databaseservice.HandleRedirect(bytes.NewBuffer(redirectRequestModelJson), requestId)
+		if err != nil {
+			if err.Error() == http.StatusText(http.StatusNotFound) {
+				h.logger.Error(zap.String("Request Id", requestId), "URL not found", zap.Error(err))
+				http.Error(w, "URL not found", http.StatusNotFound)
+				return
+			}
+
+			h.logger.Error(zap.String("Request Id", requestId), "Error processing redirect request", zap.Error(err))
+			http.Error(w, "Something went wrong!", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	http.Redirect(w, r, redirectResponseModel.Url, http.StatusMovedPermanently)
