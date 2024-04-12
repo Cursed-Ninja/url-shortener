@@ -1,11 +1,12 @@
 package main
 
 import (
-	databaseservice "cache-server/database-service"
+	databaseservice "cache-server/external/database-service"
 	"cache-server/internal/cache"
 	"cache-server/internal/config"
 	"cache-server/internal/handlers"
 	"cache-server/internal/logging"
+	"cache-server/internal/middlewares"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -37,6 +38,6 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/redirect", handler.HandleRedirect).Methods(http.MethodPost)
 
-	http.Handle("/", r)
+	http.Handle("/", middlewares.LoggingMiddleware(r))
 	logger.Error(http.ListenAndServe(":8082", nil))
 }

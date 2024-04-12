@@ -21,7 +21,6 @@ type cache struct {
 }
 
 func NewCache(config config.ConfigInterface, logger *zap.SugaredLogger) (*cache, error) {
-
 	REDIS_ADDR := config.Get("REDIS_ADDR")
 	REDIS_PASSWORD := config.Get("REDIS_PASSWORD")
 	REDIS_DB, err := strconv.Atoi(config.Get("REDIS_DB"))
@@ -82,6 +81,10 @@ func (cache *cache) SetValue(key, value, requestId string, expiryTime time.Durat
 	}
 
 	return err
+}
+
+func (cache *cache) Flush() error {
+	return cache.client.FlushAll(context.Background()).Err()
 }
 
 func (cache *cache) Close() error {
