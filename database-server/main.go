@@ -6,6 +6,7 @@ import (
 	"url-shortner-database/internal/database"
 	"url-shortner-database/internal/handlers"
 	"url-shortner-database/internal/logging"
+	"url-shortner-database/internal/middlewares"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -39,6 +40,6 @@ func main() {
 	r.HandleFunc("/shorten", handlers.HandleShorten).Methods(http.MethodPost)
 	r.HandleFunc("/redirect", handlers.HandleRedirect).Methods(http.MethodPost)
 
-	http.Handle("/", r)
+	http.Handle("/", middlewares.LoggingMiddleware(r))
 	logger.Error(http.ListenAndServe(":8081", nil))
 }
