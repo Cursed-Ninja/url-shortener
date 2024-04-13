@@ -1,8 +1,9 @@
 module main-server
 
-go 1.21.3
+go 1.22.2
 
 require (
+	github.com/cursed-ninja/go-kafka-producer v0.0.0-20240413161251-bdd52eb274d1
 	github.com/davidmytton/url-verifier v1.0.1
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.4.0
@@ -14,6 +15,7 @@ require (
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
+	github.com/confluentinc/confluent-kafka-go v1.9.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
