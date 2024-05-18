@@ -14,14 +14,13 @@ func NewLogger(kafkaProducer io.Writer) (*zap.SugaredLogger, error) {
 
 	newLogger, err := zap.NewDevelopment()
 
-	if env != "DEVELOPMENT" {
+	if env == "production" {
 		encoder := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
 		var kafkaPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 			return lvl >= zapcore.InfoLevel
 		})
 
 		newLogger = zap.New(zapcore.NewCore(encoder, zapcore.Lock(zapcore.AddSync(kafkaProducer)), kafkaPriority))
-		err = nil
 	}
 
 	if err != nil {

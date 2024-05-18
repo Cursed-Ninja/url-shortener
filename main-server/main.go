@@ -16,22 +16,27 @@ import (
 )
 
 func main() {
-	producer, err := kafka.NewKafkaProducer([]string{"host1:9092", "host2:9092"}, "topic")
+
+	initailLogger, err := zap.NewDevelopment()
 
 	if err != nil {
 		panic(err)
 	}
 
-	logger, err := logging.NewLogger(producer)
-	if err != nil {
-		panic(err)
-	}
-	defer logger.Sync()
+	logger := initailLogger.Sugar()
 
 	config, err := config.NewConfig(logger)
 	if err != nil {
 		logger.Fatal("Could not load config", zap.Error(err))
 	}
+
+	producer := kafka.NewKafkaProducer([]string{config.Get("KAFKA_SERVICE_BASE_URL")}, "main-server")
+
+	logger, err = logging.NewLogger(producer)
+	if err != nil {
+		panic(err)
+	}
+	defer logger.Sync()
 
 	databaseservice := databaseservice.NewDatabaseService(config, logger)
 	cacheservice := cacheservice.NewCacheService(config, logger)

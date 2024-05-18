@@ -22,3 +22,5 @@ go.work
 
 # Environment Files
 *.env
+
+docker-compose.yml
