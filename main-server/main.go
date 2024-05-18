@@ -16,14 +16,13 @@ import (
 )
 
 func main() {
-
-	initailLogger, err := zap.NewDevelopment()
+	initialLogger, err := zap.NewDevelopment()
 
 	if err != nil {
 		panic(err)
 	}
 
-	logger := initailLogger.Sugar()
+	logger := initialLogger.Sugar()
 
 	config, err := config.NewConfig(logger)
 	if err != nil {
