@@ -26,10 +26,10 @@ func NewBaseHandler(logger *zap.SugaredLogger, dbConnection database.DBInterface
 
 func (h *baseHandler) HandleShorten(w http.ResponseWriter, r *http.Request) {
 	requestId := r.Header.Get("X-request-id")
-	h.logger.Info(zap.String("Request Id", requestId), "Handling shorten request", zap.Any("request", r.Body))
+	h.logger.Infow("Handling shorten request", zap.String("Request Id", requestId), zap.Any("request", r.Body))
 
 	if r.Body == nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Empty request body")
+		h.logger.Errorw("Empty request body", zap.String("Request Id", requestId))
 		http.Error(w, "Empty request body", http.StatusBadRequest)
 		return
 	}
@@ -37,25 +37,25 @@ func (h *baseHandler) HandleShorten(w http.ResponseWriter, r *http.Request) {
 	httpBody, err := io.ReadAll(r.Body)
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Error reading request body", zap.Error(err))
+		h.logger.Errorw("Error reading request body", zap.String("Request Id", requestId), zap.Error(err))
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 		return
 	}
 
-	h.logger.Info(zap.String("Request Id", requestId), "Successfully read request body", zap.Any("request", httpBody))
+	h.logger.Infow("Successfully read request body", zap.String("Request Id", requestId), zap.Any("request", httpBody))
 
 	unmarsheledBody := &models.ShortenRequestModel{}
 
 	err = json.Unmarshal(httpBody, unmarsheledBody)
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Error unmarshalling request body", zap.Error(err))
+		h.logger.Errorw("Error unmarshalling request body", zap.String("Request Id", requestId), zap.Error(err))
 		http.Error(w, "Error unmarshalling JSON", http.StatusInternalServerError)
 		return
 	}
 
 	if unmarsheledBody.Url == "" {
-		h.logger.Error(zap.String("Request Id", requestId), "Empty URL in request body")
+		h.logger.Errorw("Empty URL in request body", zap.String("Request Id", requestId))
 		http.Error(w, "Empty URL in request body", http.StatusBadRequest)
 		return
 	}
@@ -70,12 +70,12 @@ func (h *baseHandler) HandleShorten(w http.ResponseWriter, r *http.Request) {
 		url.ShortUrlPath = utils.KeyGenerationService(unmarsheledBody.Url + requestId)
 	}
 
-	h.logger.Info(zap.String("Request Id", requestId), "Generated shortened URL", zap.Any("url", url))
+	h.logger.Infow("Generated shortened URL", zap.String("Request Id", requestId), zap.Any("url", url))
 
 	err = h.dbConnection.InsertOne(url)
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Error inserting document", zap.Error(err))
+		h.logger.Errorw("Error inserting document", zap.String("Request Id", requestId), zap.Error(err))
 		http.Error(w, "Error inserting document", http.StatusInternalServerError)
 		return
 	}
@@ -87,7 +87,7 @@ func (h *baseHandler) HandleShorten(w http.ResponseWriter, r *http.Request) {
 	jsonBody, err := json.Marshal(shortenedUrl)
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Error unmarshalling request body", zap.Error(err))
+		h.logger.Errorw("Error unmarshalling request body", zap.String("Request Id", requestId), zap.Error(err))
 		http.Error(w, "Error marshalling JSON", http.StatusInternalServerError)
 		return
 	}
@@ -95,16 +95,16 @@ func (h *baseHandler) HandleShorten(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonBody)
 
-	h.logger.Info(zap.String("Request Id", requestId), "Successfully shortened URL", zap.Any("response", shortenedUrl))
+	h.logger.Infow("Successfully shortened URL", zap.String("Request Id", requestId), zap.Any("response", shortenedUrl))
 }
 
 func (h *baseHandler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 	requestId := r.Header.Get("X-request-id")
 
-	h.logger.Info(zap.String("Request Id", requestId), "Handling redirect request", zap.Any("request", r.Body))
+	h.logger.Infow("Handling redirect request", zap.String("Request Id", requestId), zap.Any("request", r.Body))
 
 	if r.Body == nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Empty request body")
+		h.logger.Errorw("Empty request body", zap.String("Request Id", requestId))
 		http.Error(w, "Empty request body", http.StatusBadRequest)
 		return
 	}
@@ -112,25 +112,25 @@ func (h *baseHandler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 	httpBody, err := io.ReadAll(r.Body)
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Error reading request body", zap.Error(err))
+		h.logger.Errorw("Error reading request body", zap.String("Request Id", requestId), zap.Error(err))
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 		return
 	}
 
-	h.logger.Info(zap.String("Request Id", requestId), "Successfully read request body", zap.Any("request", httpBody))
+	h.logger.Infow("Successfully read request body", zap.String("Request Id", requestId), zap.Any("request", httpBody))
 
 	unmarsheledBody := &models.RedirectRequestModel{}
 
 	err = json.Unmarshal(httpBody, unmarsheledBody)
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Error unmarshalling request body", zap.Error(err))
+		h.logger.Errorw("Error unmarshalling request body", zap.String("Request Id", requestId), zap.Error(err))
 		http.Error(w, "Error unmarshalling JSON", http.StatusInternalServerError)
 		return
 	}
 
 	if unmarsheledBody.ShortUrlPath == "" {
-		h.logger.Error(zap.String("Request Id", requestId), "Empty URL in request body")
+		h.logger.Errorw("Empty URL in request body", zap.String("Request Id", requestId))
 		http.Error(w, "Empty URL in request body", http.StatusBadRequest)
 		return
 	}
@@ -138,7 +138,7 @@ func (h *baseHandler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 	url, err := h.dbConnection.FindOne(bson.D{{Key: "shorturlpath", Value: unmarsheledBody.ShortUrlPath}})
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Document not found", zap.Error(err))
+		h.logger.Errorw("Document not found", zap.String("Request Id", requestId), zap.Error(err))
 		http.Error(w, "Not found", http.StatusNotFound)
 		return
 	}
@@ -147,12 +147,12 @@ func (h *baseHandler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 		Url: url.OriginalUrl,
 	}
 
-	h.logger.Info(zap.String("Request Id", requestId), "Found document", zap.Any("document", url))
+	h.logger.Infow("Found document", zap.String("Request Id", requestId), zap.Any("document", url))
 
 	jsonResponse, err := json.Marshal(response)
 
 	if err != nil {
-		h.logger.Error(zap.String("Request Id", requestId), "Error marshalling JSON", zap.Error(err))
+		h.logger.Errorw("Error marshalling JSON", zap.String("Request Id", requestId), zap.Error(err))
 		http.Error(w, "Error marshalling JSON", http.StatusInternalServerError)
 		return
 	}
@@ -160,5 +160,5 @@ func (h *baseHandler) HandleRedirect(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
 
-	h.logger.Info(zap.String("Request Id", requestId), "Successfully redirected URL", zap.Any("response", jsonResponse))
+	h.logger.Infow("Successfully redirected URL", zap.String("Request Id", requestId), zap.Any("response", jsonResponse))
 }

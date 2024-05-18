@@ -8,21 +8,33 @@ import (
 	"url-shortner-database/internal/logging"
 	"url-shortner-database/internal/middlewares"
 
+	kafka "github.com/cursed-ninja/go-kafka-producer"
+
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
 
 func main() {
-	logger, err := logging.NewLogger()
+	initialLogger, err := zap.NewDevelopment()
+
+	if err != nil {
+		panic(err)
+	}
+
+	logger := initialLogger.Sugar()
+
+	config, err := config.NewConfig(logger)
+	if err != nil {
+		logger.Fatalw("Could not load config", zap.Error(err))
+	}
+
+	producer := kafka.NewKafkaProducer([]string{config.Get("KAFKA_SERVICE_BASE_URL")}, "main-server")
+
+	logger, err = logging.NewLogger(producer)
 	if err != nil {
 		panic(err)
 	}
 	defer logger.Sync()
-
-	config, err := config.NewConfig(logger)
-	if err != nil {
-		logger.Fatal("Could not load config", zap.Error(err))
-	}
 
 	MONGO_URI := config.Get("MONGO_URI")
 	DB_NAME := config.Get("DB_NAME")

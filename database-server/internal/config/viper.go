@@ -31,6 +31,6 @@ func NewConfig(logger *zap.SugaredLogger) (*config, error) {
 }
 
 func (config *config) Get(key string) string {
-	config.logger.Info("Getting config value", zap.String("key", key), zap.String("value", config.viper.GetString(key)))
+	config.logger.Infow("Getting config value", zap.String("key", key), zap.String("value", config.viper.GetString(key)))
 	return config.viper.GetString(key)
 }
