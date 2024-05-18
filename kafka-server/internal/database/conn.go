@@ -11,6 +11,7 @@ import (
 
 type DBInterface interface {
 	InsertOne(document interface{}) error
+	Disconnect() error
 }
 
 type dB struct {

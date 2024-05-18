@@ -32,7 +32,7 @@ func main() {
 		log.Fatalf("Error creating config: %v", err)
 	}
 
-	database_base_url := appConfig.Get("DATABASE_SERVICE_BASE_URL")
+	database_base_url := appConfig.Get("MONGO_URI")
 	db_name := appConfig.Get("DB_NAME")
 	main_server_collection_name := appConfig.Get("MAIN_SERVER_COLLECTION_NAME")
 	cache_server_collection_name := appConfig.Get("CACHE_SERVER_COLLECTION_NAME")
@@ -43,7 +43,7 @@ func main() {
 		constants.TOPIC_DATABASE_SERVER,
 	}
 
-	consumerGroup, err := sarama.NewConsumerGroup([]string{"localhost:29092"}, "example-group", config)
+	consumerGroup, err := sarama.NewConsumerGroup([]string{appConfig.Get("KAFKA_SERVICE_BASE_URL")}, "example-group", config)
 	if err != nil {
 		log.Fatalf("Error creating consumer group: %v", err)
 	}
