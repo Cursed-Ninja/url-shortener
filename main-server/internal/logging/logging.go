@@ -15,7 +15,11 @@ func NewLogger(kafkaProducer io.Writer) (*zap.SugaredLogger, error) {
 	newLogger, err := zap.NewDevelopment()
 
 	if env == "production" {
-		encoder := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
+		encoderCfg := zap.NewProductionEncoderConfig()
+		encoderCfg.TimeKey = "timestamp"
+		encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+
+		encoder := zapcore.NewJSONEncoder(encoderCfg)
 		var kafkaPriority = zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 			return lvl >= zapcore.InfoLevel
 		})
