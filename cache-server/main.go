@@ -9,27 +9,39 @@ import (
 	"cache-server/internal/middlewares"
 	"net/http"
 
+	kafka "github.com/cursed-ninja/go-kafka-producer"
+
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
 
 func main() {
-	logger, err := logging.NewLogger()
+	initialLogger, err := zap.NewDevelopment()
+
+	if err != nil {
+		panic(err)
+	}
+
+	logger := initialLogger.Sugar()
+
+	config, err := config.NewConfig(logger)
+	if err != nil {
+		logger.Fatalw("Could not load config", zap.Error(err))
+	}
+
+	producer := kafka.NewKafkaProducer([]string{config.Get("KAFKA_SERVICE_BASE_URL")}, "cache-server")
+
+	logger, err = logging.NewLogger(producer)
 	if err != nil {
 		panic(err)
 	}
 	defer logger.Sync()
 
-	config, err := config.NewConfig(logger)
-	if err != nil {
-		logger.Fatal("Could not load config", zap.Error(err))
-	}
-
 	dbService := databaseservice.NewDatabaseService(config, logger)
 
 	cacheService, err := cache.NewCache(config, logger)
 	if err != nil {
-		logger.Fatal("Could not create cache service", zap.Error(err))
+		logger.Fatalw("Could not create cache service", zap.Error(err))
 	}
 	defer cacheService.Close()
 

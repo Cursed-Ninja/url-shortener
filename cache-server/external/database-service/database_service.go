@@ -28,12 +28,12 @@ func NewDatabaseService(config config.ConfigInterface, logger *zap.SugaredLogger
 func (d *databaseService) HandleRedirect(body io.Reader, requestId string) (string, error) {
 	reqUrl := d.config.Get("DATABASE_SERVICE_BASE_URL") + "/redirect"
 
-	d.logger.Info(zap.String("requestId", requestId), "Sending request to database service", zap.String("url", reqUrl))
+	d.logger.Infow("Sending request to database service", zap.String("requestId", requestId), zap.String("url", reqUrl))
 
 	req, err := http.NewRequest(http.MethodPost, reqUrl, body)
 
 	if err != nil {
-		d.logger.Error(zap.String("requestId", requestId), "Error creating request at database service", zap.Error(err))
+		d.logger.Errorw("Error creating request at database service", zap.String("requestId", requestId), zap.Error(err))
 		return "", err
 	}
 
@@ -44,36 +44,35 @@ func (d *databaseService) HandleRedirect(body io.Reader, requestId string) (stri
 	resp, err := client.Do(req)
 
 	if err != nil {
-		d.logger.Error(zap.String("requestId", requestId), "Error sending request to database service", zap.Error(err))
+		d.logger.Errorw("Error sending request to database service", zap.String("requestId", requestId), zap.Error(err))
 		return "", err
 	}
 
 	if resp.StatusCode == http.StatusNotFound {
-		d.logger.Error(zap.String("requestId", requestId), "Request failed at database service", zap.Int("status", resp.StatusCode), zap.String("status", resp.Status))
+		d.logger.Errorw("Request failed at database service", zap.String("requestId", requestId), zap.Int("status", resp.StatusCode), zap.String("status", resp.Status))
 		return "", errors.New(http.StatusText(http.StatusNotFound))
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		d.logger.Error(zap.String("requestId", requestId), "Request failed at database service", zap.Int("status", resp.StatusCode), zap.String("status", resp.Status))
+		d.logger.Errorw("Request failed at database service", zap.String("requestId", requestId), zap.Int("status", resp.StatusCode), zap.String("status", resp.Status))
 		return "", errors.New("request failed at database service")
 	}
 
-	d.logger.Info(zap.String("requestId", requestId), "Request successful", zap.String("status", resp.Status))
+	d.logger.Infow("Request successful", zap.String("requestId", requestId), zap.String("status", resp.Status))
 
 	if resp.Body == nil {
-		d.logger.Error(zap.String("Request Id", requestId), "Empty response body from database service")
+		d.logger.Errorw("Empty response body from database service", zap.String("Request Id", requestId))
 		return "", errors.New("empty response body")
 	}
 
 	httpBody, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		d.logger.Error(zap.String("Request Id", requestId), "Error reading response body at database service", zap.Error(err))
+		d.logger.Errorw("Error reading response body at database service", zap.String("Request Id", requestId), zap.Error(err))
 		return "", err
 	}
-	
 
-	d.logger.Info(zap.String("Request Id", requestId), "Successfully read response body at database service", zap.Any("response", string(httpBody)))
+	d.logger.Infow("Successfully read response body at database service", zap.String("Request Id", requestId), zap.Any("response", string(httpBody)))
 
 	return string(httpBody), nil
 }
