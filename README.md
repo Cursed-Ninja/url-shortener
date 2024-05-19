@@ -29,21 +29,21 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/cursed-ninja/url-shortner">
+  <a href="https://github.com/cursed-ninja/url-shortener">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">URL Shortner</h3>
+<h3 align="center">URL Shortener</h3>
 
   <p align="center">
-    This is a simple URL shortner project built using Go.
+    This is a simple URL shortener project built using Go.
     <br />
-    <a href="https://github.com/cursed-ninja/url-shortner"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/cursed-ninja/url-shortener"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/cursed-ninja/url-shortner/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/cursed-ninja/url-shortener/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/cursed-ninja/url-shortner/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/cursed-ninja/url-shortener/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -147,7 +147,7 @@ Additionally, you will need to create an account on the following platforms:
 2. Run the redis server on your local machine.
 3. Clone the repo
    ```sh
-   git clone https://github.com/cursed-ninja/url-shortner.git
+   git clone https://github.com/cursed-ninja/url-shortener.git
    ```
 4. For each service, create a folder `config` and a file `app.env` inside it. The below is an example of the `app.env` file for each of the service.
 
@@ -164,7 +164,7 @@ Additionally, you will need to create an account on the following platforms:
 
    ```env
    MONGO_URI="ENTER YOUR MONGO URI"
-   DB_NAME=url-shortner
+   DB_NAME=url-shortener
    COLLECTION_NAME=urls
    KAFKA_SERVICE_BASE_URL=localhost:29092
    ```
@@ -183,7 +183,7 @@ Additionally, you will need to create an account on the following platforms:
 
    ```env
    MONGO_URI="ENTER YOUR MONGO URI"
-   DB_NAME=url-shortner
+   DB_NAME=url-shortener
    MAIN_SERVER_COLLECTION_NAME=main-server-logs
    CACHE_SERVER_COLLECTION_NAME=cache-server-logs
    DATABASE_SERVER_COLLECTION_NAME=database-server-logs
@@ -264,23 +264,23 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 Shivam Mahajan - [@Cursed-Ninja](https://linkedin.com/in/cursed-ninja) - shivam.sm2002@gmail.com
 
-Project Link: [https://github.com/cursed-ninja/url-shortner](https://github.com/cursed-ninja/url-shortner)
+Project Link: [https://github.com/cursed-ninja/url-shortener](https://github.com/cursed-ninja/url-shortener)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/cursed-ninja/url-shortner.svg?style=for-the-badge
-[contributors-url]: https://github.com/cursed-ninja/url-shortner/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/cursed-ninja/url-shortner.svg?style=for-the-badge
-[forks-url]: https://github.com/cursed-ninja/url-shortner/network/members
-[stars-shield]: https://img.shields.io/github/stars/cursed-ninja/url-shortner.svg?style=for-the-badge
-[stars-url]: https://github.com/cursed-ninja/url-shortner/stargazers
-[issues-shield]: https://img.shields.io/github/issues/cursed-ninja/url-shortner.svg?style=for-the-badge
-[issues-url]: https://github.com/cursed-ninja/url-shortner/issues
-[license-shield]: https://img.shields.io/github/license/cursed-ninja/url-shortner.svg?style=for-the-badge
-[license-url]: https://github.com/Cursed-Ninja/url-Shortner/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/cursed-ninja/url-shortener.svg?style=for-the-badge
+[contributors-url]: https://github.com/cursed-ninja/url-shortener/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/cursed-ninja/url-shortener.svg?style=for-the-badge
+[forks-url]: https://github.com/cursed-ninja/url-shortener/network/members
+[stars-shield]: https://img.shields.io/github/stars/cursed-ninja/url-shortener.svg?style=for-the-badge
+[stars-url]: https://github.com/cursed-ninja/url-shortener/stargazers
+[issues-shield]: https://img.shields.io/github/issues/cursed-ninja/url-shortener.svg?style=for-the-badge
+[issues-url]: https://github.com/cursed-ninja/url-shortener/issues
+[license-shield]: https://img.shields.io/github/license/cursed-ninja/url-shortener.svg?style=for-the-badge
+[license-url]: https://github.com/Cursed-Ninja/url-Shortener/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/cursed-ninja
 [GoLang]: https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white
