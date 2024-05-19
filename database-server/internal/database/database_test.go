@@ -95,7 +95,7 @@ func TestFindOne(t *testing.T) {
 	}
 
 	t.Run("Found case", func(t *testing.T) {
-		filter := bson.D{{Key: "shortenedurl", Value: "test"}}
+		filter := bson.D{{Key: "shorturlpath", Value: "test"}}
 		_, err := db.FindOne(filter)
 		assert.Nil(t, err, "Error finding document")
 	})

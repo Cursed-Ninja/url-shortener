@@ -26,8 +26,8 @@ func TestGet(t *testing.T) {
 			expected: "",
 		},
 		"EXISTENT_KEY": {
-			key:      "BASE_URL",
-			expected: "http://localhost:8080",
+			key:      "DATABASE_SERVICE_BASE_URL",
+			expected: "http://localhost:8081",
 		},
 	}
 
