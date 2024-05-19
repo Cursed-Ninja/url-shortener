@@ -28,7 +28,7 @@ func main() {
 		logger.Fatalw("Could not load config", zap.Error(err))
 	}
 
-	producer := kafka.NewKafkaProducer([]string{config.Get("KAFKA_SERVICE_BASE_URL")}, "database-server")
+	producer := kafka.NewKafkaProducer([]string{config.Get("KAFKA_SERVICE_BASE_URL")}, "database-server", true)
 
 	logger, err = logging.NewLogger(producer)
 	if err != nil {
