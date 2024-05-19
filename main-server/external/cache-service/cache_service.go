@@ -30,12 +30,12 @@ func NewCacheService(config config.ConfigInterface, logger *zap.SugaredLogger) *
 func (c *cacheService) HandleRedirect(body io.Reader, requestId string) (*models.RedirectResponseModel, error) {
 	reqUrl := c.config.Get("CACHE_SERVICE_BASE_URL") + "/redirect"
 
-	c.logger.Infow("Sending request to cache service", zap.String("requestId", requestId), zap.String("url", reqUrl))
+	c.logger.Infow("Sending request to cache service", zap.String("Request Id", requestId), zap.String("url", reqUrl))
 
 	req, err := http.NewRequest(http.MethodPost, reqUrl, body)
 
 	if err != nil {
-		c.logger.Errorw("Error creating request at cache service", zap.String("requestId", requestId), zap.Error(err))
+		c.logger.Errorw("Error creating request at cache service", zap.String("Request Id", requestId), zap.Error(err))
 		return nil, err
 	}
 
@@ -46,16 +46,16 @@ func (c *cacheService) HandleRedirect(body io.Reader, requestId string) (*models
 	resp, err := client.Do(req)
 
 	if err != nil {
-		c.logger.Errorw("Error sending request to cache service", zap.String("requestId", requestId), zap.Error(err))
+		c.logger.Errorw("Error sending request to cache service", zap.String("Request Id", requestId), zap.Error(err))
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusNotFound {
-		c.logger.Errorw("Request failed at cache service", zap.String("requestId", requestId), zap.Int("status", resp.StatusCode), zap.String("status", resp.Status))
+	if resp.StatusCode == http.StatusNotFound {
+		c.logger.Errorw("Request failed at cache service", zap.String("Request Id", requestId), zap.Int("status", resp.StatusCode), zap.String("status", resp.Status))
 		return nil, errors.New(http.StatusText(http.StatusNotFound))
 	}
 
-	c.logger.Infow("Request successful", zap.String("requestId", requestId), zap.String("status", resp.Status))
+	c.logger.Infow("Request successful", zap.String("Request Id", requestId), zap.String("status", resp.Status))
 
 	if resp.Body == nil {
 		c.logger.Errorw("Empty response body from cache service", zap.String("Request Id", requestId))

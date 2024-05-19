@@ -95,8 +95,6 @@ func (pool *WorkerPool) worker() {
 			log.Printf("Error inserting document: %v", err)
 			pool.results <- err
 		} else {
-			log.Printf("Message received: topic=%s partition=%d offset=%d key=%s value=%s\n",
-				job.message.Topic, job.message.Partition, job.message.Offset, string(job.message.Key), string(job.message.Value))
 			job.session.MarkMessage(job.message, "")
 			pool.results <- nil
 		}
