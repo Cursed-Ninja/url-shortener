@@ -173,10 +173,10 @@ Additionally, you will need to create an account on the following platforms:
 
    ```env
    DATABASE_SERVICE_BASE_URL=http://localhost:8081
-    REDIS_ADDR=localhost:6379
-    REDIS_PASSWORD=12345678
-    REDIS_DB=0
-    KAFKA_SERVICE_BASE_URL=localhost:29092
+   REDIS_ADDR=localhost:6379
+   REDIS_PASSWORD=12345678
+   REDIS_DB=0
+   KAFKA_SERVICE_BASE_URL=localhost:29092
    ```
 
    - Kafka Service
